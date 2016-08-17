@@ -1,8 +1,7 @@
 ---
 # defaults file for ansible-role-teamcity/
 
-teamcity_host: "78.47.69.231"
-teamcity_port: "8080"
+teamcity_host: "https://build.rapidpm.org"
 download_directory: "/tmp/"
 
 agent_install_folder: "/opt/teamcity/agent"

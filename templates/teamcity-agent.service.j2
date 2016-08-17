@@ -1,13 +1,15 @@
 [Unit]
 Description=TeamCity Build Agent
 After=network.target
+RootDirectory={{agent_install_folder}}/bin
 
 [Service]
+RemainAfterExit=yes
 Type=forking
 User={{teamcity_user}}
 PIDFile={{agent_install_folder}}/logs/buildAgent.pid
 ExecStart={{agent_install_folder}}/bin/agent.sh start
-ExecStop={{agent_install_folder}}/bin/agent.sh stop
+ExecStop={{agent_install_folder}}/bin/agent.sh stop kill
 
 [Install]
 WantedBy=multi-user.target

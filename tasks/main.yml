@@ -9,7 +9,7 @@
   user: name="{{teamcity_user}}" group={{teamcity_group}} state=present
 
 - name: download teamcity
-  get_url: url="https://{{ teamcity_host }}/update/buildAgent.zip" dest="{{download_directory}}/agent.zip" validate_certs=False
+  get_url: url="{{ teamcity_host }}/update/buildAgent.zip" dest="{{download_directory}}/agent.zip" validate_certs=False
 
 - name: create dir
   become: true
@@ -23,10 +23,13 @@
   become: yes
   template: src=teamcity-agent.service.j2 dest=/etc/systemd/system/teamcity-agent.service owner=root mode=755
 
+- name: reload systemd
+  command: systemctl daemon-reload
 
 - name: shutdown agend
   service: name=teamcity-agent state=stopped
   when: servicefile.stat.exists == True
+  ignore_errors: True
 
 - name: install unzip
   become: true
@@ -37,11 +40,35 @@
   become: yes
   unarchive: src="{{download_directory}}/agent.zip" dest="{{agent_install_folder}}" copy=no
 
+- name: set serverUrl
+  lineinfile:
+    dest: "{{agent_install_folder}}/conf/buildAgent.properties"
+    regexp: "serverUrl=.*"
+    line: "serverUrl={{teamcity_host}}"
 
+- name: set set name
+  lineinfile:
+    dest: "{{agent_install_folder}}/conf/buildAgent.properties"
+    regexp: "name=.*"
+    line: "name={{inventory_hostname}}"
 
-- name: create config
-  become: yes
-  template: src=buildAgent.properties.j2 dest="{{agent_install_folder}}/conf/buildAgent.properties"
+- name: set workdir
+  lineinfile:
+    dest: "{{agent_install_folder}}/conf/buildAgent.properties"
+    regexp: "workDir=.*"
+    line: "workDir={{agent_install_folder}}/work"
+
+- name: set tempdir 
+  lineinfile:
+    dest: "{{agent_install_folder}}/conf/buildAgent.properties"
+    regexp: "tempDir=.*"
+    line: "tempDir={{agent_install_folder}}/tmp"
+
+- name: set systemDir 
+  lineinfile:
+    dest: "{{agent_install_folder}}/conf/buildAgent.properties"
+    regexp: "systemDir=.*"
+    line: "systemDir={{agent_install_folder}}/system"
 
 - name: chown dir
   become: true
