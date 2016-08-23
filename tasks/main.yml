@@ -40,6 +40,14 @@
   become: yes
   unarchive: src="{{download_directory}}/agent.zip" dest="{{agent_install_folder}}" copy=no
 
+- name: check if properties exist
+  stat: path="{{agent_install_folder}}/conf/buildAgent.properties"
+  register: propertiesFile
+
+- name: copy properties
+  shell: "cp {{agent_install_folder}}/conf/buildAgent.dist.properties {{agent_install_folder}}/conf/buildAgent.properties"
+  when: propertiesFile.stat.exists == False
+
 - name: set serverUrl
   lineinfile:
     dest: "{{agent_install_folder}}/conf/buildAgent.properties"
