@@ -78,6 +78,16 @@
     regexp: "systemDir=.*"
     line: "systemDir={{agent_install_folder}}/system"
 
+- name: set environment variables
+  lineinfile: 
+    dest: "{{agent_install_folder}}/conf/buildAgent.properties"
+    regexp: "{{item.var}}=.*"
+    line: "{{item.var}}={{item.value}}"
+    insertafter: EOF
+  with_items: "{{agent_env_vars}}"
+    
+    
+
 - name: chown dir
   become: true
   file: path="{{agent_install_folder}}" state=directory owner="{{teamcity_user}}" group="{{teamcity_group}}" mode="755" recurse=yes

@@ -9,5 +9,7 @@ agent_install_folder: "/opt/teamcity/agent"
 
 teamcity_user: "teamcity"
 teamcity_group: "teamcity"
-teamcity_http_port: "80"
 
+
+agent_env_vars:
+- {env: test, value: true}
